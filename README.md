@@ -1,0 +1,1 @@
+# Xpirit-Vsts-Release-Settings
