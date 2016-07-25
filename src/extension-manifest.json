@@ -1,0 +1,69 @@
+{
+  "manifestVersion": 1,
+  "id": "PascalNaber-Xpirit-WebSettings",
+  "name": "Azure WebApp Configuration task",
+  "version": "1.0.1",
+  "publisher": "pascalnaber",
+  "public": false,
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "Release task",
+  "categories": [
+    "Build and release"
+  ],
+  "tags": [
+    "WebApp",
+    "WebJob",
+    "Settings",
+    "AppSettings",
+    "ConnectionString",
+    "Configuration"
+  ],
+  "content": {
+    "details": {
+      "path": "Xpirit.Vsts.Release.Settings.Extension/readme.md"
+    },
+    "license": {
+      "path": "Xpirit.Vsts.Release.Settings.Extension/license.txt"
+    }
+  },
+  "links": {
+    "getstarted": {
+      "uri": "https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings/wiki"
+    },
+    "support": {
+      "uri": "https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings/wiki"
+    }
+  },
+
+
+
+  "branding": {
+    "color": "rgb(36, 43, 50)",
+    "theme": "dark"
+  },
+  "icons": {
+    "default": "Xpirit.Vsts.Release.Settings.Extension/Images/Icon128.png"
+  },
+  "files": [
+    {
+      "path": "Xpirit.Vsts.Release.Settings"
+    }
+  ],
+
+  "contributions": [
+    {
+      "id": "Xpirit-Vsts-Release-WebSettings",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "Xpirit.Vsts.Release.Settings"
+      }
+    }
+  ]
+}

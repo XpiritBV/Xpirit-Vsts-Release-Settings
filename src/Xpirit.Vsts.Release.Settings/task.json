@@ -1,0 +1,115 @@
+{
+  "id": "589ED0E7-982C-4317-928F-19C419C947DC",
+  "name": "webappconfiguration",
+  "friendlyName": "Apply variables to Azure webapp",
+  "description": "Apply AppSettings and ConnectionStrings from VSTS variables to a webapp",
+  "helpMarkDown": "[More Information, setup...](https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings/wiki)",
+  "category": "Utility",
+  "author": "Pascal Naber (Xpirit)",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 59
+  },
+  "demands": [ "azureps" ],
+  "visibility": [
+    "Release"
+  ],
+  "minimumAgentVersion": "1.102.0",
+  "groups": [
+  ],
+  "inputs": [
+    {
+      "name": "ConnectedServiceName",
+      "type": "connectedService:AzureRM",
+      "label": "AzureRM Subscription",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Select the Azure Resource Manager subscription."
+    },
+    {
+      "name": "WebAppName",
+      "type": "pickList",
+      "label": "Web App Name",
+      "defaultValue": "",
+      "required": true,
+      "properties": {
+        "EditableOptions": "True"
+      },
+      "helpMarkDown": "Enter or Select the name of an existing AzureRM Web Application."
+    },
+    {
+      "name": "DeployToSlotFlag",
+      "type": "boolean",
+      "label": "Deploy to Slot",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Select the option to apply settings to an existing slot other than the Production slot. If this option is not selected, then the settings of the AzureRM Web App will be applied to the Production slot."
+    },
+    {
+      "name": "ResourceGroupName",
+      "type": "pickList",
+      "label": "Resource Group",
+      "defaultValue": "",
+      "required": true,
+      "properties": {
+        "EditableOptions": "True"
+      },
+      "helpMarkDown": "Enter or Select the Azure Resource Group that contains the AzureRM Web App specified above.",
+      "visibleRule": "DeployToSlotFlag = true"
+    },
+    {
+      "name": "SlotName",
+      "type": "pickList",
+      "label": "Slot",
+      "defaultValue": "",
+      "required": true,
+      "properties": {
+        "EditableOptions": "True"
+      },
+      "helpMarkDown": "Enter or Select an existing Slot other than the Production slot.",
+      "visibleRule": "DeployToSlotFlag = true"
+    },
+    {
+      "name": "Cleanup",
+      "type": "boolean",
+      "label": "Cleanup WebApp configuration",
+      "defaultValue": "true",
+      "required": true,
+      "helpMarkDown": "Overwrites all current settings in Azure"
+    }
+  ],
+  "dataSourceBindings": [
+    {
+      "target": "WebAppName",
+      "endpointId": "$(ConnectedServiceName)",
+      "dataSourceName": "AzureRMWebAppNames"
+    },
+    {
+      "target": "ResourceGroupName",
+      "endpointId": "$(ConnectedServiceName)",
+      "dataSourceName": "AzureRMWebAppResourceGroup",
+      "parameters": {
+        "WebAppName": "$(WebAppName)"
+      }
+    },
+    {
+      "target": "SlotName",
+      "endpointId": "$(ConnectedServiceName)",
+      "dataSourceName": "AzureRMWebAppSlotsId",
+      "parameters": {
+        "WebAppName": "$(WebAppName)",
+        "ResourceGroupName": "$(ResourceGroupName)"
+      },
+      "resultTemplate": "{\"Value\":\"{{{ #extractResource slots}}}\",\"DisplayValue\":\"{{{ #extractResource slots}}}\"}"
+    }
+  ],
+  "instanceNameFormat": "Apply settings variables to website: $(WebAppName)",
+  "execution": {
+    "AzurePowerShell": {
+      "target": "$(currentDirectory)\\ApplySettings.ps1",
+      "argumentFormat": "",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}
