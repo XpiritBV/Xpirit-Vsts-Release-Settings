@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "id": "PascalNaber-Xpirit-WebSettings",
+  "id": "PascalNaber-Xpirit-WebAppConfiguration",
   "name": "Azure WebApp Configuration task",
   "version": "1.0.1",
   "publisher": "pascalnaber",
@@ -32,10 +32,10 @@
   },
   "links": {
     "getstarted": {
-      "uri": "https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings/wiki"
+      "uri": "https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings"
     },
     "support": {
-      "uri": "https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings/wiki"
+      "uri": "https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings"
     }
   },
 
