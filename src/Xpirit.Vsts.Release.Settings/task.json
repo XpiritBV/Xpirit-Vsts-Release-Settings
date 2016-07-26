@@ -9,7 +9,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 59
+    "Patch": 69
   },
   "demands": [ "azureps" ],
   "visibility": [
@@ -71,9 +71,39 @@
       "visibleRule": "DeployToSlotFlag = true"
     },
     {
+      "name": "ValidateFlag",
+      "type": "boolean",
+      "label": "Validate variables",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Select the option to validate if there are appsettings or connectionstrings in the web.config that are not present in the VSTS variables"
+    },
+    {
+      "name": "WebConfigFile",
+      "type": "filePath",
+      "label": "Web.config to validate against",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Location of the Web.config",
+      "visibleRule": "ValidateFlag = true"
+    },
+    {
+      "name": "comparerResultAction",
+      "type": "pickList",
+      "label": "Validation result action",
+      "defaultValue": "fail",
+      "required": true,
+      "options": {        
+        "warn": "Write warning",
+        "fail": "Fail with error"
+      },
+      "helpMarkDown": "Specify the action based on the comparer results.",
+      "visibleRule": "ValidateFlag = true"
+    },
+    {
       "name": "Cleanup",
       "type": "boolean",
-      "label": "Cleanup WebApp configuration",
+      "label": "Overwrite existing configuration",
       "defaultValue": "true",
       "required": true,
       "helpMarkDown": "Overwrites all current settings in Azure"

@@ -15,14 +15,21 @@ param(
     [String] [Parameter(Mandatory = $false)]
     $SlotName,
 	
+	[String] [Parameter(Mandatory = $true)]
+    $ValidateFlag,
+
+	[String] [Parameter(Mandatory = $true)]
+    $WebConfigFile,
+	[string] $comparerResultAction,
 	[string] $Cleanup = "true"
 )
 
 $Clean = (Convert-String $Cleanup Boolean)
+$Validate = (Convert-String $ValidateFlag Boolean)
 
 Write-Verbose "Entering script $($MyInvocation.MyCommand.Name)"
 Write-Verbose "Parameter Values"
-$PSBoundParameters.Keys | %{ Write-Host "$_ = $($PSBoundParameters[$_])" }
+$PSBoundParameters.Keys | %{ Write-Verbose "$_ = $($PSBoundParameters[$_])" }
 
 Write-Verbose "Importing modules"
 import-module "Microsoft.TeamFoundation.DistributedTask.Task.Internal"
@@ -30,6 +37,46 @@ import-module "Microsoft.TeamFoundation.DistributedTask.Task.Common"
 
 $settingHelperPath = "./Modules\Xpirit.Vsts.Release.SettingHelper.dll"
 import-module $settingHelperPath
+
+function Output-ValidationResults()
+{
+	if ($Validate)
+	{
+		switch($comparerResultAction)
+		{
+		
+			'warn' { 
+				foreach ($validationError in $validationErrors) 
+				{
+					Write-Warning $validationError 
+				}
+			}
+			'fail' { 
+				foreach ($validationError in $validationErrors) 
+				{
+					Write-Error $validationError 
+				}
+			}
+			default { Write-Verbose "No result action selected." } 
+		}
+	}
+}
+
+$validationErrors = New-Object 'System.Collections.Generic.List[string]'
+
+#Read web.config
+$xml = [xml] (Get-Content $WebConfigFile)
+
+Write-Host "Start reading config file"
+$appSettingKeys = $xml.configuration.appSettings.add |  Select-Object -ExpandProperty key
+Write-Host $appSettingKeys
+Write-Host $appSettingKeys.Count
+
+$connectionStringNames = $xml.configuration.connectionStrings.add |  Select-Object -ExpandProperty name
+Write-Host $connectionStringNames
+Write-Host $connectionStringNames.Count
+Write-Host "Finished reading config file"
+Write-Host "Should validate: $Validate"
 
 if($SlotName)
 {
@@ -86,7 +133,7 @@ Write-Verbose "connectionstrings: $connectionStringsHashTable"
 # Get all variables. Loop through each and apply if needed.
 $value = Get-TaskVariables -Context $distributedTaskContext 
 Write-Verbose "Variable Values"
-$value.Keys | %{ Write-Host "$_ = $($value[$_])" }
+$value.Keys | %{ Write-Verbose "$_ = $($value[$_])" }
 foreach ($h in $value.GetEnumerator()) {
 	Write-Verbose "Found key: $($h.Key): $($h.Value)"
 	$originalKey = $h.Key
@@ -110,6 +157,20 @@ foreach ($h in $value.GetEnumerator()) {
 		Write-Host "Store appsetting $cleanKey with value $Value"
 
 		$settings[$cleanKey.ToString()] = $Value.ToString();		
+		
+		if ($Validate -and $appSettingKeys)
+		{
+			Write-Host "Going to validate $cleankey to:"
+			Write-Host $appSettingKeys
+			Write-Host "here we go"
+
+			$found = $appSettingKeys.Contains($cleanKey);
+			if (!$found)
+			{
+				$validationErrors.Add("Cannot find appSetting [$cleanKey] in web.config. But the key does exist in VSTS as a variable")
+			}
+			Write-Host "Validated"
+		}
 	}
 	elseif ($originalKey.StartsWith("connectionstring."))
 	{		
@@ -143,10 +204,48 @@ foreach ($h in $value.GetEnumerator()) {
 		}    
 			
 		Write-Verbose "Store connectionstring $cleanKey with value $Value of type $type"
-		        
+		if ($Validate -and $connectionStringNames)
+		{
+			$found = $connectionStringNames.Contains($cleanKey);
+			if (!$found)
+			{
+				$validationErrors.Add("Cannot find connectionString [$cleanKey] in web.config. But the key does exist in VSTS as a variable")
+			}       
+		}
 		$connectionStringsHashTable[$cleanKey] = @{"Value" = $Value.ToString(); "Type" = $type.ToString()}        
 	}
 }
+
+#Validate variables
+
+if ($Validate)
+{
+	if ($appSettingKeys)
+	{
+		foreach ($configAppSetting in $appSettingKeys.GetEnumerator()) {
+			Write-Host "Trying to validate appsetting [$configAppSetting]"
+			$found = $settings.Contains($configAppSetting);
+			if (!$found)
+			{
+				$validationErrors.Add("Cannot find VSTS variable with name [appsetting.$configAppSetting]. But the key does exist in the web.config")
+			}  
+		}
+	}
+	if ($connectionStringNames)
+	{
+		foreach ($configConnectionString in $connectionStringNames.GetEnumerator()) {
+			Write-Host "Trying to validate connectionstring [$configAppSetting]"
+			$found = $connectionStringsHashTable.Contains($configConnectionString);
+			if (!$found)
+			{
+				$validationErrors.Add("Cannot find VSTS variable with name [connectionstring.$configConnectionString]. But the key does exist in the web.config")
+			}  
+		}
+	}
+}
+
+# Output validation
+Output-ValidationResults
 
 # Apply appsettings and connectionstrings to the webapp
 Write-Verbose "Write appsettings and/or connectionstrings if needed"
