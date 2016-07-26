@@ -32,6 +32,14 @@
   <ItemGroup>
     <Compile Include="Images\Icon128.png" />
     <Compile Include="License.txt" />
+    <Compile Include="Readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\addtask.png" />
+    <Content Include="Images\azure.png" />
+    <Content Include="Images\cleantask.png" />
+    <Content Include="Images\vstsvariables.png" />
+    <Content Include="Images\webconfig.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
