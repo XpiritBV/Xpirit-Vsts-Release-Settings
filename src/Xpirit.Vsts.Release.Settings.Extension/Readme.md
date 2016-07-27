@@ -39,7 +39,7 @@ The table below shows some examples:
 ![alt tag](https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings/raw/master/src/Xpirit.Vsts.Release.Settings.Extension/Images/cleantask.png)
     All yellow fields are required.
 
-  - Select an AzureRM subscription. If you don’t know how to configure this. Read this blogpost.
+  - Select an AzureRM subscription. If you don’t know how to configure this. [Read this blogpost](https://pascalnaber.wordpress.com/2016/07/27/create-an-azure-service-principal-and-a-vsts-arm-endpoint/).
   - Select the web app name.
   - Select the resourcegroup.
   - If you want to deploy to a Deployment slot, check the Deploy to Slot checkbox and select the Slot.
