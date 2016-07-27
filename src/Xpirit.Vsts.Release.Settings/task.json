@@ -3,7 +3,7 @@
   "name": "webappconfiguration",
   "friendlyName": "Apply variables to Azure webapp",
   "description": "Apply AppSettings and ConnectionStrings from VSTS variables to a webapp",
-  "helpMarkDown": "[More Information, setup...](https://github.com/XpiritBV/Xpirit-Vsts-Release-Settings)",
+  "helpMarkDown": "[More Information, setup...](https://pascalnaber.wordpress.com/2016/07/27/vsts-task-to-deploy-appsettings-and-connectionstrings-to-an-azure-webapp/)",
   "category": "Utility",
   "author": "Pascal Naber (Xpirit)",
   "version": {
