@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "PascalNaber-Xpirit-WebAppConfiguration",
   "name": "Azure WebApp Configuration task",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "pascalnaber",
   "public": true,
   "targets": [

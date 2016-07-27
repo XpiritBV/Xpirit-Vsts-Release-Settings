@@ -231,33 +231,19 @@ function Validate-WebConfigVariablesAreInVSTSVariables()
 	}
 }
 
-function AddSettingToStickyVariables()
+function AddSettingAsAppSetting()
 {
-	param(
-		[string] $originalKey,
+	param(	
+		[string] $originalKey,	
 		[string] $cleanKey,
 		[string] $value
 	)
 
 	if ($originalKey.Contains(".sticky"))
 	{
-		if ($originalKey.StartsWith("appsetting."))
-		{	
-			$stickyAppSettingNames.Add($cleanKey)
-		}
-		elseif ($originalKey.StartsWith("connectionstring."))
-		{
-			$stickyConnectionStringNames.Add($cleanKey)  
-		}
+		Write-Verbose "AppSetting $cleanKey added to sticky"
+		$stickyAppSettingNames.Add($cleanKey)
 	}
-}
-
-function AddSettingAsAppSetting()
-{
-	param(		
-		[string] $cleanKey,
-		[string] $value
-	)
 
 	Write-Host "Store appsetting $cleanKey with value $Value"
 
@@ -279,6 +265,7 @@ function AddSettingAsAppSetting()
 function AddSettingAsConnectionString()
 {
 	param(		
+		[string] $originalKey,
 		[string] $cleanKey,
 		[string] $value
 	)
@@ -321,6 +308,12 @@ function AddSettingAsConnectionString()
 		}       
 	}
 
+	if ($originalKey.Contains(".sticky"))
+	{
+		Write-Verbose "Connectionstring $cleanKey added to sticky"
+		$stickyConnectionStringNames.Add($cleanKey)  
+	}
+
 	Write-Host "Store connectionstring $cleanKey with value $Value of type $type"
 	$connectionStringsHashTable[$cleanKey] = @{"Value" = $Value.ToString(); "Type" = $type.ToString()}
 }
@@ -351,18 +344,15 @@ foreach ($h in $vstsVariables.GetEnumerator()) {
 	$cleanKey = $originalKey.Replace(".sticky", "").Replace("appsetting.", "").Replace("connectionstring.", "")
 	$Value = Get-TaskVariable $distributedTaskContext $originalKey
 
-	AddSettingToStickyVariables -originalKey $originalKey -cleanKey $cleanKey -value $Value
-		
 	if ($originalKey.StartsWith("appsetting."))
 	{	
-		AddSettingAsAppSetting -cleanKey $cleanKey -value $Value
+		AddSettingAsAppSetting -originalKey $originalKey -cleanKey $cleanKey -value $Value
 	}
 	elseif ($originalKey.StartsWith("connectionstring."))
 	{		
-		AddSettingAsConnectionString -cleanKey $cleanKey -value $value
+		AddSettingAsConnectionString -originalKey $originalKey -cleanKey $cleanKey -value $value
 	}
 }
-
 
 Validate-WebConfigVariablesAreInVSTSVariables
 
