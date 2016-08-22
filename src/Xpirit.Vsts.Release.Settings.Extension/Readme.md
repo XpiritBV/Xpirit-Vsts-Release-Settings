@@ -23,11 +23,11 @@ The table below shows some examples:
 | ------------------------------ | ----------------------------------------------------| ----- |
 | appsetting                     | appsetting.mysetting                                
 | sticky appsetting              | appsetting.sticky.mysetting                         
-| connectionstring to SQL Server | connectionstring.sqlserver.myconnectionstring       
-| connectionstring to SQL Azure  | connectionstring.sqlazure.myconnectionstring        
-| connectionstring to custom     | connectionstring.custom.myconnectionstring          
-| connectionstring to MySQL      | connectionstring.mysql.myconnectionstring           
-| sticky connectionstring        | connectionstring.sqlserver.sticky.myconnectionstring
+| connectionstring to SQL Server | connectionstring.myconnectionstring.sqlserver       
+| connectionstring to SQL Azure  | connectionstring.myconnectionstring.sqlazure       
+| connectionstring to custom     | connectionstring.myconnectionstring.custom         
+| connectionstring to MySQL      | connectionstring.myconnectionstring.mysql           
+| sticky connectionstring        | connectionstring.myconnectionstring.sqlserver.sticky
 
 
 ##Steps to use and configure the task
