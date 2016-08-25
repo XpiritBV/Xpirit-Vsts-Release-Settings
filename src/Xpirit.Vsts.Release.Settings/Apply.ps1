@@ -1,47 +1,19 @@
-﻿[cmdletbinding()]
-param(
-[String] [Parameter(Mandatory = $true)]
-    $ConnectedServiceName,
+﻿$WebAppName = Get-Input -Name "WebAppName" 
+$DeployToSlotFlag= Get-Input -Name "DeployToSlotFlag" 
+$ResourceGroupName= Get-Input -Name "ResourceGroupName" 
+$SlotName= Get-Input -Name "SlotName" 
+$WebConfigFile= Get-Input -Name "WebConfigFile" 
+$validationResultAction= Get-Input -Name "validationResultAction" 
+$Validate = Get-Input -Name "ValidateFlag" -AsBool
+$Clean = Get-Input -Name "CleanUp" -AsBool
 
-    [String] [Parameter(Mandatory = $true)]
-    $WebAppName,
-
-    [String] [Parameter(Mandatory = $true)]
-    $DeployToSlotFlag,
-
-    [String] [Parameter(Mandatory = $false)]
-    $ResourceGroupName,
-
-    [String] [Parameter(Mandatory = $false)]
-    $SlotName,
-	
-	[String] [Parameter(Mandatory = $true)]
-    $ValidateFlag,
-
-	[String] [Parameter(Mandatory = $true)]
-    $WebConfigFile,
-	[string] $validationResultAction,
-	[string] $Cleanup = "true"
-)
-
-Write-Verbose "Entering script $($MyInvocation.MyCommand.Name)"
-Write-Verbose "Parameter Values"
-$PSBoundParameters.Keys | %{ Write-Verbose "$_ = $($PSBoundParameters[$_])" }
-
-Write-Verbose "Importing modules"
-import-module "Microsoft.TeamFoundation.DistributedTask.Task.Internal"
-import-module "Microsoft.TeamFoundation.DistributedTask.Task.Common"
-
-$settingHelperPath = "./Modules\Xpirit.Vsts.Release.SettingHelper.dll"
-import-module $settingHelperPath
-
-#Convert string parameters to bools
-$Clean = (Convert-String $Cleanup Boolean)
-$Validate = (Convert-String $ValidateFlag Boolean)
+Write-TaskVerbose "Entering script $($MyInvocation.MyCommand.Name)"
+Write-TaskVerbose "Parameter Values"
+$PSBoundParameters.Keys | %{ Write-TaskVerbose "$_ = $($PSBoundParameters[$_])" }
 
 function Output-ValidationResults()
-{
-	Write-Verbose "Output-ValidationResults. Should Validate: $Validate"
+{	
+	Write-TaskVerbose "Output-ValidationResults. Should Validate: $Validate"
 	if ($Validate)
 	{
 		switch($validationResultAction)
@@ -50,44 +22,44 @@ function Output-ValidationResults()
 			'warn' { 
 				foreach ($validationError in $validationErrors) 
 				{
-					Write-Warning $validationError 
+					Write-TaskWarning $validationError 
 				}
 			}
 			'fail' { 
 				foreach ($validationError in $validationErrors) 
 				{
-					Write-Error $validationError 
+					Write-TaskError $validationError 
 				}
 			}
-			default { Write-Verbose "No result action selected." } 
+			default { Write-TaskVerbose "No result action selected." } 
 		}
-	}
+	}	
 }
 
 function Write-Settings-To-WebApp()
 {
-	Write-Verbose "Write-Settings-To-WebApp"	
+	Write-TaskVerbose "Write-Settings-To-WebApp"	
 
 	# The appsettings and connectionstrings has to be updated separately because when one of the collections is empty, an exception will be raised.
 	if($SlotName){
 
 		if ($settings.Count -gt 0){
-			Write-Verbose "Write appsettings to website with deploymentslot"	
+			Write-TaskVerbose "Write appsettings to website with deploymentslot"	
 			$site = Set-AzureRMWebAppSlot -Name $WebAppName -ResourceGroupName $ResourceGroupName -AppSettings $settings -Slot $SlotName			
 		}
 		if ($connectionStringsHashTable.Count -gt 0){
-			Write-Verbose "Write connectionstrings to website with deploymentslot"	
+			Write-TaskVerbose "Write connectionstrings to website with deploymentslot"	
 			$site = Set-AzureRMWebAppSlot -Name $WebAppName -ResourceGroupName $ResourceGroupName -ConnectionStrings $connectionStringsHashTable -Slot $SlotName			
 		}
 	}
 	else
 	{
 		if ($settings.Count -gt 0){
-			Write-Verbose "Write appsettings to website"	
+			Write-TaskVerbose "Write appsettings to website"	
 			$site = Set-AzureRMWebApp -Name $WebAppName -ResourceGroupName $ResourceGroupName -AppSettings $settings 
 		}
 		if ($connectionStringsHashTable.Count -gt 0){
-			Write-Verbose "Write connectionstrings to website"			
+			Write-TaskVerbose "Write connectionstrings to website"			
 
 			$site = Set-AzureRMWebApp -Name $WebAppName -ResourceGroupName $ResourceGroupName -ConnectionStrings $connectionStringsHashTable	
 		}
@@ -96,7 +68,7 @@ function Write-Settings-To-WebApp()
 
 function Write-Sticky-Settings()
 {
-	Write-Verbose "Write-Sticky-Settings"
+	Write-TaskVerbose "Write-Sticky-Settings"
 	$resourceName = $WebAppName + "/slotConfigNames"
 
 	$stickySlot.properties.appSettingNames = $stickyAppSettingNames.ToArray()
@@ -107,51 +79,51 @@ function Write-Sticky-Settings()
 
 function Read-WebConfigToPrepareValidation()
 {
-	Write-Verbose "Read-WebConfigToPrepareValidation. Validate: $Validate"
+	Write-TaskVerbose "Read-WebConfigToPrepareValidation. Validate: $Validate"
 	if ($Validate)
 	{
 		#Read web.config
 		$xml = [xml] (Get-Content $WebConfigFile)
 
-		Write-Verbose "Start reading appsettings"
+		Write-TaskVerbose "Start reading appsettings"
 		foreach($appSetting in $xml.configuration.appSettings.add)
 		{
 			$script:appSettingKeys[$appSetting.key] = $appSetting.key
 		}
 				
-		Write-Verbose "Start reading connectionstrings"
+		Write-TaskVerbose "Start reading connectionstrings"
 		foreach($connectionString in $xml.configuration.connectionStrings.add)
 		{
 			$script:connectionStringNames[$connectionString.name] = $connectionString.name
 		}
 	
 		
-		Write-Verbose "Finished reading config file"		
+		Write-TaskVerbose "Finished reading config file"		
 	}
 }
 
 function Read-Settings-From-WebApp()
 {
-	Write-Verbose "Read-Settings-From-WebApp"
+	Write-TaskVerbose "Read-Settings-From-WebApp"
 
 	if($SlotName)
 	{
-		Write-Verbose "Reading configuration from website $WebAppName and deploymentslot $SlotName" 
+		Write-TaskVerbose "Reading configuration from website $WebAppName and deploymentslot $SlotName" 
 		$script:WebSite = Get-AzureRmWebAppSlot -Name $WebAppName -Slot $SlotName -ResourceGroupName $ResourceGroupName
 	}
 	else
 	{
-		Write-Verbose "Reading configuration from website $WebAppName" 
+		Write-TaskVerbose "Reading configuration from website $WebAppName" 
 		$script:WebSite = Get-AzureRmWebApp -Name $WebAppName -ResourceGroupName $ResourceGroupName
 	}
 	if(!$WebSite) 
 	{
 		$error = ("Failed to find WebSite {0}" -f $WebAppName)
-		Write-Error $error
+		Write-TaskError $error
 		throw $error
 	}
 
-	Write-Verbose "Fetch appsettings"
+	Write-TaskVerbose "Fetch appsettings"
 	# Get all appsettings and put in Hashtable (because Set-AzureRMWebApp needs that)
 	if (!$Clean)
 	{
@@ -159,8 +131,8 @@ function Read-Settings-From-WebApp()
 			$settings[$kvp.Name] = $kvp.Value
 		}
 	}
-	Write-Verbose "appsettings: $settings"
-	Write-Verbose "Fetch connectionstrings"
+	Write-TaskVerbose "appsettings: $settings"
+	Write-TaskVerbose "Fetch connectionstrings"
 
 	# Get all connectionstrings and put it in a Hashtable (because Set-AzureRMWebApp needs that)	
 	if (!$Clean)
@@ -169,12 +141,12 @@ function Read-Settings-From-WebApp()
 			$connectionStringsHashTable[$kvp.Name] = @{"Value" = $kvp.ConnectionString.ToString(); "Type" = $kvp.Type.ToString()} #Make sure that Type is a string    
 		}
 	}
-	Write-Verbose "connectionstrings: $connectionStringsHashTable"
+	Write-TaskVerbose "connectionstrings: $connectionStringsHashTable"
 }
 
 function Read-Sticky-Settings()
 {
-	Write-Verbose "Read-Sticky-Settings"
+	Write-TaskVerbose "Read-Sticky-Settings"
 	
 	$resourceName = $WebAppName + "/slotConfigNames"
 	$script:stickySlot = Get-AzureRmResource -ResourceName $resourceName -ResourceGroupName $ResourceGroupName -ResourceType "Microsoft.Web/sites/config" -ApiVersion "2015-08-01"
@@ -185,28 +157,28 @@ function Read-Sticky-Settings()
 		$stickyAppSettingNames.AddRange($script:stickySlot.properties.appSettingNames)
 		$stickyConnectionStringNames.AddRange($script:stickySlot.properties.connectionStringNames)
 	}
-	Write-Verbose "Finished Read-Sticky-Settings"
+	Write-TaskVerbose "Finished Read-Sticky-Settings"
 }
 
 function Read-Variables-From-VSTS()
 {
-	Write-Verbose "Read-Variables-From-VSTS"
+	Write-TaskVerbose "Read-Variables-From-VSTS"
 	# Get all variables. Loop through each and apply if needed.
-	$script:vstsVariables = Get-TaskVariables -Context $distributedTaskContext 
-	Write-Verbose "Variable Values"
-	$vstsVariables.Keys | %{ Write-Verbose "$_ = $($vstsVariables[$_])" }
+	$script:vstsVariables = Get-TaskVariableInfo 
+	Write-TaskVerbose "Variable Values"
+	$vstsVariables.Name | %{ Write-TaskVerbose "$_ = $($vstsVariables[$_])" }
 }
 
 function Validate-WebConfigVariablesAreInVSTSVariables()
 {
-	Write-Verbose "Validate-WebConfigVariablesAreInVSTSVariables. Validate: $Validate"
+	Write-TaskVerbose "Validate-WebConfigVariablesAreInVSTSVariables. Validate: $Validate"
 	if ($Validate)
 	{
 		if ($appSettingKeys)
 		{
-			foreach ($configAppSetting in $appSettingKeys.GetEnumerator()) {
+			foreach ($configAppSetting in @($appSettingKeys)) {
 				$configAppSettingName = $configAppSetting.key
-				Write-Verbose "Trying to validate appsetting [$configAppSettingName]"
+				Write-TaskVerbose "Trying to validate appsetting [$configAppSettingName]"
 				$found = $settings.Contains($configAppSettingName);
 				if (!$found)
 				{
@@ -216,11 +188,11 @@ function Validate-WebConfigVariablesAreInVSTSVariables()
 		}
 		if ($connectionStringNames)
 		{
-			Write-Verbose "validate connectionstrings"			
+			Write-TaskVerbose "validate connectionstrings"			
 
-			foreach ($configConnectionString in $connectionStringNames.GetEnumerator()) {
+			foreach ($configConnectionString in @($connectionStringNames)) {
 				$configConnectionStringName = $configConnectionString.key
-				Write-Verbose "Trying to validate connectionstring [$configConnectionStringName]"
+				Write-TaskVerbose "Trying to validate connectionstring [$configConnectionStringName]"
 				$found = $connectionStringsHashTable.Contains($configConnectionStringName);
 				if (!$found)
 				{
@@ -241,7 +213,7 @@ function AddSettingAsAppSetting()
 
 	if ($originalKey.Contains(".sticky"))
 	{
-		Write-Verbose "AppSetting $cleanKey added to sticky"
+		Write-TaskVerbose "AppSetting $cleanKey added to sticky"
 		$stickyAppSettingNames.Add($cleanKey)
 	}
 
@@ -251,14 +223,14 @@ function AddSettingAsAppSetting()
 		
 	if ($Validate -and $appSettingKeys)
 	{
-		Write-Verbose "Going to validate $cleankey to:"
+		Write-TaskVerbose "Going to validate $cleankey to:"
 
 		$found = $appSettingKeys.Contains($cleanKey);
 		if (!$found)
 		{
 			$validationErrors.Add("Cannot find appSetting [$cleanKey] in web.config. But the key does exist in VSTS as a variable")
 		}
-		Write-Verbose "Validated"
+		Write-TaskVerbose "Validated"
 	}
 }
 
@@ -270,7 +242,7 @@ function AddSettingAsConnectionString()
 		[string] $value
 	)
 
-	Write-Verbose "Start applying connectionstring $cleanKey with value $Value"		
+	Write-TaskVerbose "Start applying connectionstring $cleanKey with value $Value"		
 		
     if ($cleanKey.Contains(".sqlazure"))
 	{
@@ -295,7 +267,7 @@ function AddSettingAsConnectionString()
 	else
 	{
 		$error = ("No database type given for connectionstring name {0} for website {1}. use naming convention: connectionstring.yourconnectionstring.sqlserver.sticky" -f $cleanKey, $WebAppName)
-		Write-Error $error
+		Write-TaskError $error
 		throw $error
 	}   			
 		
@@ -310,7 +282,7 @@ function AddSettingAsConnectionString()
 
 	if ($originalKey.Contains(".sticky"))
 	{
-		Write-Verbose "Connectionstring $cleanKey added to sticky"
+		Write-TaskVerbose "Connectionstring $cleanKey added to sticky"
 		$stickyConnectionStringNames.Add($cleanKey)  
 	}
 
@@ -337,20 +309,22 @@ Read-Settings-From-WebApp
 Read-Sticky-Settings
 Read-Variables-From-VSTS
 
-foreach ($h in $vstsVariables.GetEnumerator()) {
-	Write-Verbose "Processing vstsvariable: $($h.Key): $($h.Value)"
-
-	$originalKey = $h.Key
-	$cleanKey = $originalKey.Replace(".sticky", "").Replace("appsetting.", "").Replace("connectionstring.", "")
-	$Value = Get-TaskVariable $distributedTaskContext $originalKey
-
-	if ($originalKey.StartsWith("appsetting."))
-	{	
-		AddSettingAsAppSetting -originalKey $originalKey -cleanKey $cleanKey -value $Value
-	}
-	elseif ($originalKey.StartsWith("connectionstring."))
-	{		
-		AddSettingAsConnectionString -originalKey $originalKey -cleanKey $cleanKey -value $value
+if ($vstsVariables -ne $null){
+	foreach ($h in @($vstsVariables)) {
+		Write-TaskVerbose "Processing vstsvariable: $($h.Name): $($h.Value)"
+		
+		$originalKey = $h.Name
+		$cleanKey = $originalKey.Replace(".sticky", "").Replace("appsetting.", "").Replace("connectionstring.", "")
+		$Value = Get-TaskVariable -Name $originalKey
+		
+		if ($originalKey.StartsWith("appsetting."))
+		{	
+			AddSettingAsAppSetting -originalKey $originalKey -cleanKey $cleanKey -value $Value
+		}
+		elseif ($originalKey.StartsWith("connectionstring."))
+		{		
+			AddSettingAsConnectionString -originalKey $originalKey -cleanKey $cleanKey -value $value
+		}
 	}
 }
 
@@ -366,5 +340,6 @@ else
 	Write-Settings-To-WebApp
 	Write-Sticky-Settings
 }
-Write-Verbose "##vso[task.complete result=Succeeded;]DONE"
+Write-TaskVerbose "##vso[task.complete result=Succeeded;]DONE"
+
 

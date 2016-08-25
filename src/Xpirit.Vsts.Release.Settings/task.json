@@ -1,7 +1,7 @@
 {
   "id": "589ED0E7-982C-4317-928F-19C419C947DC",
   "name": "webappconfiguration",
-  "friendlyName": "Apply variables to Azure webapp",
+  "friendlyName": "Test Apply variables to Azure webapp",
   "description": "Apply AppSettings and ConnectionStrings from VSTS variables to a webapp",
   "helpMarkDown": "[More Information, setup...](https://pascalnaber.wordpress.com/2016/07/27/vsts-task-to-deploy-appsettings-and-connectionstrings-to-an-azure-webapp/)",
   "category": "Utility",
@@ -9,13 +9,13 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 91
+    "Patch": 94
   },
   "demands": [ "azureps" ],
   "visibility": [
     "Release"
   ],
-  "minimumAgentVersion": "1.102.0",
+  "minimumAgentVersion": "2.105.2",
   "groups": [
   ],
   "inputs": [
@@ -137,8 +137,8 @@
   ],
   "instanceNameFormat": "Apply variables to website: $(WebAppName)",
   "execution": {
-    "AzurePowerShell": {
-      "target": "$(currentDirectory)\\ApplySettings.ps1",
+    "PowerShell3": {
+      "target": "$(currentDirectory)\\Apply.ps1",
       "argumentFormat": "",
       "workingDirectory": "$(currentDirectory)"
     }

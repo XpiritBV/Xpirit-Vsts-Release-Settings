@@ -1,10 +1,10 @@
 {
   "manifestVersion": 1,
-  "id": "PascalNaber-Xpirit-WebAppConfiguration",
-  "name": "Azure WebApp Configuration task",
-  "version": "1.0.1",
+  "id": "PascalNaber-Xpirit-WebAppConfiguration-TEST",
+  "name": "Test Azure WebApp Configuration task",
+  "version": "1.0.4",
   "publisher": "pascalnaber",
-  "public": true,
+  "public": false,
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
