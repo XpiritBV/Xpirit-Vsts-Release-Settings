@@ -1,21 +1,21 @@
 {
   "id": "589ED0E7-982C-4317-928F-19C419C947DC",
   "name": "webappconfiguration",
-  "friendlyName": "Test Apply variables to Azure webapp",
+  "friendlyName": "Apply variables to Azure webapp",
   "description": "Apply AppSettings and ConnectionStrings from VSTS variables to a webapp",
   "helpMarkDown": "[More Information, setup...](https://pascalnaber.wordpress.com/2016/07/27/vsts-task-to-deploy-appsettings-and-connectionstrings-to-an-azure-webapp/)",
   "category": "Utility",
   "author": "Pascal Naber (Xpirit)",
   "version": {
     "Major": 1,
-    "Minor": 0,
-    "Patch": 94
+    "Minor": 1,
+    "Patch": 0
   },
   "demands": [ "azureps" ],
   "visibility": [
     "Release"
   ],
-  "minimumAgentVersion": "2.105.2",
+  "minimumAgentVersion": "1.102.0",
   "groups": [
   ],
   "inputs": [

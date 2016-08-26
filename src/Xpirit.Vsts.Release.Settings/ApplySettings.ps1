@@ -359,7 +359,8 @@ Validate-WebConfigVariablesAreInVSTSVariables
 Output-ValidationResults
 if ($Validate -and $validationErrors.Count -gt 0 -and $validationResultAction -eq "fail")
 {
-	Write-Host "Not writing the settings to the webapp because there are validation errors and the validation action result is fail"		
+	Write-Host "Not writing the settings to the webapp because there are validation errors and the validation action result is fail"
+	throw "Validation errors"		
 }
 else
 {

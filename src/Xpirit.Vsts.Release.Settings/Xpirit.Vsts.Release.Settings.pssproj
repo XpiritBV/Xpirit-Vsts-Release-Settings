@@ -28,7 +28,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="modules\Microsoft.Azure.Management.Websites.dll" />
-    <Content Include="task - Copy.json" />
+    <Content Include="ps_modules\VstsAzureHelpers_\module.json" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\de-de\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\en-US\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\es-es\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\fr-fr\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\it-IT\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\ja-jp\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\ko-KR\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\ru-RU\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\zh-CN\resources.resjson" />
+    <Content Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\zh-TW\resources.resjson" />
     <Content Include="task.json" />
     <Content Include="modules\Xpirit.Vsts.Release.SettingHelper.dll" />
     <Content Include="icon.png" />
@@ -37,6 +47,9 @@
     <Compile Include="ApplySettings.ps1" />
     <Compile Include="Apply.ps1" />
     <Compile Include="modules\Xpirit.Vsts.Release.SettingHelper\Xpirit.Vsts.Release.SettingHelper.dll" />
+    <Compile Include="ps_modules\VstsAzureHelpers_\ImportFunctions.ps1" />
+    <Compile Include="ps_modules\VstsAzureHelpers_\InitializeFunctions.ps1" />
+    <Compile Include="ps_modules\VstsAzureHelpers_\VstsAzureHelpers_.psm1" />
     <Compile Include="ps_modules\VstsTaskSdk\FindFunctions.ps1" />
     <Compile Include="ps_modules\VstsTaskSdk\InputFunctions.ps1" />
     <Compile Include="ps_modules\VstsTaskSdk\lib.json" />
@@ -64,6 +77,19 @@
     <Folder Include="modules\" />
     <Folder Include="modules\Xpirit.Vsts.Release.SettingHelper\" />
     <Folder Include="ps_modules\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\de-de\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\en-US\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\es-es\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\fr-fr\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\it-IT\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\ja-jp\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\ko-KR\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\ru-RU\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\zh-CN\" />
+    <Folder Include="ps_modules\VstsAzureHelpers_\Strings\resources.resjson\zh-TW\" />
     <Folder Include="ps_modules\VstsTaskSdk\" />
     <Folder Include="ps_modules\VstsTaskSdk\0.7.1\" />
     <Folder Include="ps_modules\VstsTaskSdk\Strings\" />
