@@ -50,7 +50,7 @@ Write-Output "Azure AAD Application creation completed successfully (Application
 #Create new SPN
 Write-Output "Creating a new SPN" -Verbose
 $spn = New-AzureRmADServicePrincipal -ApplicationId $appId
-$spnName = $spn.ServicePrincipalName
+$spnName = $spn.ServicePrincipalNames
 Write-Output "SPN creation completed successfully (SPN Name: $spnName)" -Verbose
 
 
