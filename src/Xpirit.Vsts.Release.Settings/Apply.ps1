@@ -129,8 +129,14 @@ $stickySlot = Get-AzureRmResource -ResourceName $resourceName -ResourceGroupName
 if (!$Clean)
 {
 	# Fill with all existing settings
-	$stickyAppSettingNames.AddRange($stickySlot.properties.appSettingNames)
-	$stickyConnectionStringNames.AddRange($stickySlot.properties.connectionStringNames)
+	if ($stickySlot.properties.appSettingNames -ne $null) #is null when azure never contained a setting
+    {
+	    $stickyAppSettingNames.AddRange($stickySlot.properties.appSettingNames)
+    }
+    if ($stickySlot.properties.connectionStringNames -ne $null) #is null when azure never contained a setting
+    {	
+        $stickyConnectionStringNames.AddRange($stickySlot.properties.connectionStringNames)
+    }
 }
 Write-VstsTaskVerbose "Finished Read-Sticky-Settings"
 
